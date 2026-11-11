@@ -32,5 +32,21 @@ class NotesTests(unittest.TestCase):
             self.assertEqual(store.search("zebra"), [])
 
 
+class ExportTests(unittest.TestCase):
+    def test_export_all_copies_notes(self):
+        import os
+
+        from notes import NotesStore, export_all
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = os.path.join(directory, "notes")
+            target = os.path.join(directory, "backup")
+            store = NotesStore(source)
+            store.create("Plan", "ship it")
+            exported = export_all(store, target)
+            self.assertEqual(exported, ["plan.md"])
+            self.assertTrue(os.path.exists(os.path.join(target, "plan.md")))
+
+
 if __name__ == "__main__":
     unittest.main()

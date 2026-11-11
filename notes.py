@@ -38,3 +38,13 @@ class NotesStore:
                 if needle in handle.read().lower():
                     matches.append(name[:-3])
         return matches
+
+
+def export_all(store, destination):
+    """Copy every markdown note in store into destination."""
+    import shutil
+
+    os.makedirs(destination, exist_ok=True)
+    for name in store.list():
+        shutil.copy2(os.path.join(store.root, name), os.path.join(destination, name))
+    return sorted(store.list())

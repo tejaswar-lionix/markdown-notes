@@ -69,6 +69,42 @@ class RenameTests(unittest.TestCase):
                 store.rename("plan", "Plan")
 
 
+class DeleteTests(unittest.TestCase):
+    def test_delete_removes_file_and_list_excludes_it(self):
+        import os
+
+        with tempfile.TemporaryDirectory() as directory:
+            store = NotesStore(directory)
+            path = store.create("Plan", "ship it")
+            self.assertEqual(store.delete("plan"), path)
+            self.assertFalse(os.path.exists(path))
+            self.assertEqual(store.list(), [])
+
+    def test_delete_missing_note_raises(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = NotesStore(directory)
+            with self.assertRaises(FileNotFoundError):
+                store.delete("missing")
+
+
+class TitleTests(unittest.TestCase):
+    def test_titles_parses_first_heading(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = NotesStore(directory)
+            store.create("My Plan", "body")
+            self.assertEqual(store.titles(), {"my-plan": "My Plan"})
+
+    def test_titles_falls_back_to_slug_without_heading(self):
+        import os
+
+        with tempfile.TemporaryDirectory() as directory:
+            store = NotesStore(directory)
+            path = os.path.join(directory, "plain.md")
+            with open(path, "w", encoding="utf-8") as handle:
+                handle.write("no heading here\n")
+            self.assertEqual(store.titles(), {"plain": "plain"})
+
+
 class ExportTests(unittest.TestCase):
     def test_export_all_copies_notes(self):
         import os

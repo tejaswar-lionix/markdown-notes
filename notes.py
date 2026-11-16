@@ -40,6 +40,26 @@ class NotesStore:
         with open(self.path_for(slug), encoding="utf-8") as handle:
             return handle.read()
 
+    def delete(self, slug):
+        path = self.path_for(slug)
+        if not os.path.exists(path):
+            raise FileNotFoundError(path)
+        os.remove(path)
+        return path
+
+    def titles(self):
+        titles = {}
+        for name in self.list():
+            slug = name[:-3]
+            title = slug
+            with open(os.path.join(self.root, name), encoding="utf-8") as handle:
+                for line in handle:
+                    if line.startswith("# "):
+                        title = line[2:].strip()
+                        break
+            titles[slug] = title
+        return titles
+
     def search(self, query):
         needle = query.lower()
         matches = []

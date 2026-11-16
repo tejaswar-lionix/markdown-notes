@@ -23,6 +23,14 @@ class NotesStore:
             handle.write(f"# {title}\n\n{body.strip()}\n")
         return path
 
+    def append(self, slug, body):
+        path = self.path_for(slug)
+        if not os.path.exists(path):
+            raise FileNotFoundError(path)
+        with open(path, "a", encoding="utf-8") as handle:
+            handle.write("\n" + body.strip() + "\n")
+        return path
+
     def rename(self, slug, new_title):
         source = self.path_for(slug)
         if not os.path.exists(source):

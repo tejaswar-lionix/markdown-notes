@@ -6,6 +6,7 @@ Store, search, and export markdown notes.
 
 ```bash
 python3 -c "from notes import *; s=NotesStore('notes'); print(s.create('Plan', 'ship it')); print(s.list())"
+python3 -c "from notes import *; s=NotesStore('notes'); print(s.append('plan', 'more detail'))"
 python3 -c "from notes import *; s=NotesStore('notes'); print(s.rename('plan', 'New Plan'))"
 python3 -c "from notes import *; s=NotesStore('notes'); print(s.titles()); print(s.delete('plan'))"
 ```
@@ -14,6 +15,7 @@ python3 -c "from notes import *; s=NotesStore('notes'); print(s.titles()); print
 
 - One markdown file per note with slugified names
 - Rename notes without overwriting existing files
+- Append to notes with NotesStore.append(slug, body)
 - Delete notes with NotesStore.delete(slug)
 - List slug-to-title pairs with NotesStore.titles()
 - Case-insensitive full-text search

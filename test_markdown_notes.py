@@ -32,6 +32,32 @@ class NotesTests(unittest.TestCase):
             self.assertEqual(store.search("zebra"), [])
 
 
+class AppendTests(unittest.TestCase):
+    def test_append_adds_body_after_blank_line(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = NotesStore(directory)
+            store.create("Plan", "ship it")
+            path = store.append("plan", "  more detail  ")
+            self.assertTrue(path.endswith("plan.md"))
+            self.assertTrue(store.read("plan").endswith("\n\nmore detail\n"))
+
+    def test_append_keeps_original_content(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = NotesStore(directory)
+            store.create("Plan", "ship it")
+            store.append("plan", "next step")
+            content = store.read("plan")
+            self.assertIn("# Plan", content)
+            self.assertIn("ship it", content)
+            self.assertIn("next step", content)
+
+    def test_append_missing_note_raises(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = NotesStore(directory)
+            with self.assertRaises(FileNotFoundError):
+                store.append("missing", "body")
+
+
 class RenameTests(unittest.TestCase):
     def test_rename_moves_file_and_preserves_content(self):
         import os

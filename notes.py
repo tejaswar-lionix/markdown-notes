@@ -23,6 +23,16 @@ class NotesStore:
             handle.write(f"# {title}\n\n{body.strip()}\n")
         return path
 
+    def rename(self, slug, new_title):
+        source = self.path_for(slug)
+        if not os.path.exists(source):
+            raise FileNotFoundError(source)
+        destination = self.path_for(self.slugify(new_title))
+        if os.path.exists(destination):
+            raise FileExistsError(destination)
+        os.rename(source, destination)
+        return destination
+
     def list(self):
         return sorted(name for name in os.listdir(self.root) if name.endswith(".md"))
 

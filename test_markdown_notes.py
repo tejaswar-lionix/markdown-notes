@@ -32,6 +32,43 @@ class NotesTests(unittest.TestCase):
             self.assertEqual(store.search("zebra"), [])
 
 
+class RenameTests(unittest.TestCase):
+    def test_rename_moves_file_and_preserves_content(self):
+        import os
+
+        with tempfile.TemporaryDirectory() as directory:
+            store = NotesStore(directory)
+            source = store.create("Plan", "ship it")
+            with open(source, "rb") as handle:
+                original = handle.read()
+            destination = store.rename("plan", "New Plan")
+            self.assertTrue(destination.endswith("new-plan.md"))
+            self.assertFalse(os.path.exists(source))
+            with open(destination, "rb") as handle:
+                self.assertEqual(handle.read(), original)
+
+    def test_rename_conflict_raises_and_leaves_original_intact(self):
+        import os
+
+        with tempfile.TemporaryDirectory() as directory:
+            store = NotesStore(directory)
+            store.create("Plan", "ship it")
+            store.create("Other", "keep me")
+            with self.assertRaises(FileExistsError):
+                store.rename("plan", "Other")
+            self.assertTrue(os.path.exists(store.path_for("plan")))
+            self.assertTrue(os.path.exists(store.path_for("other")))
+            self.assertIn("ship it", store.read("plan"))
+            self.assertIn("keep me", store.read("other"))
+
+    def test_rename_to_same_slug_raises(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = NotesStore(directory)
+            store.create("Plan", "ship it")
+            with self.assertRaises(FileExistsError):
+                store.rename("plan", "Plan")
+
+
 class ExportTests(unittest.TestCase):
     def test_export_all_copies_notes(self):
         import os

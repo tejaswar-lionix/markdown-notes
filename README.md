@@ -29,6 +29,10 @@ python3 -c "from notes import *; s=NotesStore('notes'); print(s.titles()); print
 python3 -m unittest -q
 ```
 
+## Additional API
+
+- `NotesStore.word_count(slug)` counts the words in a note.
+
 ## License
 
 MIT

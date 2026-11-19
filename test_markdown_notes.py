@@ -172,5 +172,26 @@ class ExportTests(unittest.TestCase):
             self.assertTrue(os.path.exists(os.path.join(target, "plan.md")))
 
 
+class WordCountTests(unittest.TestCase):
+    def test_counts_words_in_note(self):
+        import tempfile
+
+        from notes import NotesStore
+
+        with tempfile.TemporaryDirectory() as directory:
+            store = NotesStore(directory)
+            store.create("Plan", "hello world again")
+            self.assertEqual(store.word_count("plan"), 5)
+
+    def test_missing_note_raises(self):
+        import tempfile
+
+        from notes import NotesStore
+
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaises(FileNotFoundError):
+                NotesStore(directory).word_count("missing")
+
+
 if __name__ == "__main__":
     unittest.main()

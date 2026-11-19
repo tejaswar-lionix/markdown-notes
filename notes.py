@@ -41,6 +41,19 @@ class NotesStore:
         os.rename(source, destination)
         return destination
 
+    def copy(self, slug, new_title):
+        source = self.path_for(slug)
+        if not os.path.exists(source):
+            raise FileNotFoundError(source)
+        destination = self.path_for(self.slugify(new_title))
+        if os.path.exists(destination):
+            raise FileExistsError(destination)
+        with open(source, encoding="utf-8") as handle:
+            content = handle.read()
+        with open(destination, "w", encoding="utf-8") as handle:
+            handle.write(content)
+        return destination
+
     def list(self):
         return sorted(name for name in os.listdir(self.root) if name.endswith(".md"))
 

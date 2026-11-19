@@ -95,6 +95,31 @@ class RenameTests(unittest.TestCase):
                 store.rename("plan", "Plan")
 
 
+class CopyTests(unittest.TestCase):
+    def test_copy_creates_new_note_with_same_body(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = NotesStore(directory)
+            store.create("Plan", "ship it")
+            destination = store.copy("plan", "Plan Backup")
+            self.assertTrue(destination.endswith("plan-backup.md"))
+            self.assertIn("ship it", store.read("plan-backup"))
+            self.assertIn("ship it", store.read("plan"))
+
+    def test_copy_duplicate_title_raises(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = NotesStore(directory)
+            store.create("Plan", "ship it")
+            store.create("Other", "keep me")
+            with self.assertRaises(FileExistsError):
+                store.copy("plan", "Other")
+
+    def test_copy_missing_source_raises(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = NotesStore(directory)
+            with self.assertRaises(FileNotFoundError):
+                store.copy("missing", "New Plan")
+
+
 class DeleteTests(unittest.TestCase):
     def test_delete_removes_file_and_list_excludes_it(self):
         import os

@@ -90,6 +90,10 @@ class NotesStore:
                     matches.append(name[:-3])
         return matches
 
+    def word_count(self, slug):
+        """Return the number of whitespace-separated words in a note."""
+        return len(self.read(slug).split())
+
 
 def export_all(store, destination):
     """Copy every markdown note in store into destination."""
